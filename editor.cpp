@@ -151,13 +151,16 @@ int main(int argc, char* argv[])
             int spaces;
             int nmaxy = maxY - 2;
             int digitcount = 0; while ((nmaxy) != 0) { (nmaxy) /= 10; digitcount++; }
-            string spacestr;
             for(int i = minY; i < maxY-1; i++)
             {
-               move(i,0);
-               spacestr = string(digitcount +1 , ' ');
                if (digitcount > 0)
-                  printw("%s", spacestr.c_str());
+               {
+                  for(int y = digitcount; y >= 0; y--)
+                  {
+                     move(i,y);
+                     delch();
+                  }
+               }
             }
             lined = false;
             y = holdy;
