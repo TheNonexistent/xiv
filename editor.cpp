@@ -17,10 +17,11 @@ int main(int argc, char* argv[])
    const int UPWARD = 106;
    const int DOWNWARD = 107;
    const int ENTER = 10;
-   const int ESCAPE = 27;
+   const int ESCAPE = 9;//ctrl + i
    const int ITRIGGER = 105;
    //Initalizing The Screen
    initscr();
+   keypad(stdscr, TRUE);
    //Switching To No Echo Mode So The getch() Does Not Automatically Echo Input
    noecho();
 
@@ -86,6 +87,12 @@ int main(int argc, char* argv[])
    refresh();
    wattron(status, A_REVERSE);
    wmove(status,0,0);
+   for(int i = 0; i <= maxX; i++)
+   {
+      wprintw(status, " ");
+      wmove(status,0,i);
+   }
+   wmove(status,0,0);
    wprintw(status, "[Normal Mode]");
    wattroff(status, A_REVERSE);
    wrefresh(status);
@@ -100,48 +107,37 @@ int main(int argc, char* argv[])
       input = getch();
       if(!insertmode)
       {
-         if(input == FORWARD)
+         switch(input)
          {
+         case FORWARD:
+         case KEY_RIGHT:
             if(x < maxX - 1) { x += 1; }
-         }
-         else if(input == BACKWARD)
-         {
+            break;
+         case BACKWARD:
+         case KEY_LEFT:
             if(x > 0) {  x -= 1; }
-         }
-         else if(input == UPWARD)
-         {
+            break;
+         case UPWARD:
+         case KEY_DOWN:
             if(y < maxY - 2) { y += 1; }
-         }
-         else if(input == DOWNWARD)
-         {
+            break;
+         case DOWNWARD:
+         case KEY_UP:
             if(y > 1) { y -= 1; }
-         }
-         else if(input == ITRIGGER)
-         {
+            break;
+         case ITRIGGER:
             insertmode = true;
             wattron(status, A_REVERSE);
             wmove(status,0,0);
             wprintw(status, "[Insert Mode]");
             wattroff(status, A_REVERSE);
             wrefresh(status);
+            break;
          }
       }
       else
       {
-         if(input == ENTER)
-         {
-         	if(y < maxY - 2)
-         	{
-               y += 1;
-         	   x = 0;
-         	}
-         	else
-         	{
-               y = 1;
-         	   x = 0;
-         	}
-         }
-         else if(input == ESCAPE)
+         if(input == ESCAPE)
          {
             insertmode = false;
             wattron(status, A_REVERSE);
@@ -150,23 +146,52 @@ int main(int argc, char* argv[])
             wattroff(status, A_REVERSE);
             wrefresh(status);
          }
+         else if(input == KEY_RIGHT)
+         {
+            if(x < maxX - 1) { x += 1; }
+         }
+         else if(input == KEY_LEFT)
+         {
+            if(x > 0) {  x -= 1; }
+         }
+         else if(input == KEY_DOWN)
+         {
+            if(y < maxY - 2) { y += 1; }
+         }
+         else if (input == KEY_UP)
+         {
+            if(y > 1) { y -= 1; }
+         }
+         else if(input == ENTER)
+         {
+            if(y < maxY - 2)
+            {
+               y += 1;
+               x = 0;
+            }
+            else
+            {
+               y = 1;
+               x = 0;
+            }
+         }
          else
          {
             printw("%c", input);
-         	if(x < maxX - 1)
-         	{
+            if(x < maxX - 1)
+            {
                x += 1;
-         	}
-         	else if(y < maxY - 2)
-         	{
+            }
+            else if(y < maxY - 2)
+            {
                x = 0;
                y += 1;
-         	}
-         	else
-         	{
+            }
+            else
+            {
                x = 0;
-         	   y = 1;
-         	}
+               y = 1;
+            }
          }
       }
       move(y,x);
