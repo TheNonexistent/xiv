@@ -13,4 +13,6 @@ extern string ofilepath;
 void opennewfile(string filename);
 void openfile(string filename);
 
+void clearstatus(int maxx, WINDOW * statwin);
+
 #endif //FILE_H
