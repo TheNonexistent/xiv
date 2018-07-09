@@ -7,6 +7,16 @@
 
 using namespace std;
 
+string ofilename;
+string ofilepath;
 
-string newfilename = "newfile";
-string newfilepath = "newfile";
+void opennewfile(string filename)
+{
+    ofilename = filename;
+    ofilepath = filename;
+}
+void openfile(string filename)
+{
+   ofilename = filename;
+   ofilepath = filename;
+}

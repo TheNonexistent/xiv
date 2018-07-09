@@ -24,33 +24,42 @@ int main(int argc, char* argv[])
    //Switching To No Echo Mode So The getch() Does Not Automatically Echo Input
    noecho();
 
-/*
-   if(argc == 2)
-   {
-      const char *outp;
-      string STRING;
-      ifstream infile;
-      infile.open (argv[1]);
-          while(!infile.eof())
-          {
-              getline(infile,STRING);
-              outp = STRING.c_str();
-              printw("%s\n", outp);
-          }
-      infile.close();
-   }
-   else
-   {
-      //start new file
-   }
-*/
-
    //Initializing Cursor Location Variables
    int y, x;
    //Declaring And Initializing Cursor Starting Location Constants
-   const int INITX = 0,INITY = 0;
+   const int INITX = 0,INITY = 1;
    //Moving Cursor To Starting Location
    move(INITY,INITX);
+
+
+   //Open Called File
+   if(argc == 2)
+   {
+      const char *outp;
+      string outstr;
+      ifstream infile;
+      infile.open (argv[1]);
+      if(infile.good())
+      {
+         ofilename = argv[1];
+         while(!infile.eof())
+         {
+            getline(infile,outstr);
+            outp = outstr.c_str();
+            printw("%s\n", outp);
+         }
+         infile.close();
+      }
+      else
+      {
+         opennewfile(argv[1]);
+      }
+   }
+   else
+   {
+      opennewfile("newfile");
+   }
+
    //Feeding The Current Location To Location Variables
    y = INITY;
    x = INITX;
@@ -62,16 +71,18 @@ int main(int argc, char* argv[])
    getmaxyx(stdscr,maxY,maxX);
 
    //Creating The Top Window
-   WINDOW * top = newwin(2,maxX ,0,0);
+   WINDOW * top = newwin(1,maxX ,0,0);
    refresh();
    wattron(top, A_REVERSE);
    wmove(top,0,(maxX-1)/2);
    wprintw(top, "XIV");
+   wmove(top,0,((maxX-1)/2) + 3);
+   wprintw(top, "  [Filename : %s]", ofilename.c_str());
    wattroff(top, A_REVERSE);
    wrefresh(top);
 
    //Creating The Status Window
-   WINDOW * status = newwin(2,maxX ,maxY - 1,0);
+   WINDOW * status = newwin(1,maxX ,maxY - 1,0);
    refresh();
    wattron(status, A_REVERSE);
    wmove(status,0,0);
@@ -103,7 +114,7 @@ int main(int argc, char* argv[])
          }
          else if(input == DOWNWARD)
          {
-            if(y > 0) { y -= 1; }
+            if(y > 1) { y -= 1; }
          }
          else if(input == ITRIGGER)
          {
@@ -126,7 +137,7 @@ int main(int argc, char* argv[])
          	}
          	else
          	{
-               y = 0;
+               y = 1;
          	   x = 0;
          	}
          }
@@ -154,7 +165,7 @@ int main(int argc, char* argv[])
          	else
          	{
                x = 0;
-         	   y = 0;
+         	   y = 1;
          	}
          }
       }
