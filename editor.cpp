@@ -62,13 +62,13 @@ int main(int argc, char* argv[])
    getmaxyx(stdscr,maxY,maxX);
 
    //Creating The Top Window
-   WINDOW * status = newwin(2,maxX ,0,0);
+   WINDOW * top = newwin(2,maxX ,0,0);
    refresh();
-   wattron(status, A_REVERSE);
-   wmove(status,0,0);
-   wprintw(status, "[Normal Mode]");
-   wattroff(status, A_REVERSE);
-   wrefresh(status);
+   wattron(top, A_REVERSE);
+   wmove(top,0,(maxX-1)/2);
+   wprintw(top, "XIV");
+   wattroff(top, A_REVERSE);
+   wrefresh(top);
 
    //Creating The Status Window
    WINDOW * status = newwin(2,maxX ,maxY - 1,0);
