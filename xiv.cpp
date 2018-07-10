@@ -31,6 +31,7 @@ int main(int argc, char* argv[])
    const int LINE = 108;//l - show line numbers
    const int SAVE = 115;//s - save the file
    const int QUIT = 113;//q - quit the program
+   const int CANCEL = 99l;//c - cancel command input
 
 
    //Initalizing The Screen
@@ -270,6 +271,13 @@ int main(int argc, char* argv[])
                case QUIT:
                endwin();
                return 0;
+               break;
+               case CANCEL:
+               clearstatus(maxX,status);
+               wmove(status,0,0);
+               wattron(status, A_REVERSE);
+               wprintw(status, "[Normal Mode]");
+               wattroff(status, A_REVERSE);
                break;
                default:
                wmove(status, 0, 0);
