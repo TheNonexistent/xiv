@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
    const int UPWARD = 106;
    const int DOWNWARD = 107;
    const int ENTER = 10;
+   const int BACKSPACE = 127;
    const int ESCAPE = 14;//n
    const int ITRIGGER = 105;
    const int CTRIGGER = 47;
@@ -340,7 +341,7 @@ int main(int argc, char* argv[])
                y += 1;
             }
          }
-         else if(input == KEY_BACKSPACE)
+         else if(input == KEY_BACKSPACE || input == BACKSPACE)
          {
             if (x > minX)
             {
