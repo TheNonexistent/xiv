@@ -2,12 +2,15 @@
 #include <ncurses.h>
 #include <cctype>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 
 #include "Include/file.h"
+#include "Include/buffer.h"
 
 using namespace std;
+
 
 
 int main(int argc, char* argv[])
@@ -18,12 +21,15 @@ int main(int argc, char* argv[])
    const int UPWARD = 106;
    const int DOWNWARD = 107;
    const int ENTER = 10;
-   const int ESCAPE = 9;//ctrl + i
+   const int ESCAPE = 14;//n
    const int ITRIGGER = 105;
    const int CTRIGGER = 47;
+   const int TAB = 9;
 
    //Delcating And Intializing Command Characters
    const int LINE = 108;//l - show line numbers
+   const int SAVE = 115;//s - save the file
+   const int QUIT = 113;//q - quit the program
 
 
    //Initalizing The Screen
@@ -31,6 +37,8 @@ int main(int argc, char* argv[])
    keypad(stdscr, TRUE);
    //Switching To No Echo Mode So The getch() Does Not Automatically Echo Input
    noecho();
+   //NO LINE BUFFER!
+   cbreak();
 
    //Defeining Minimum x and y
    int minY = 1, minX = 0;
@@ -46,7 +54,7 @@ int main(int argc, char* argv[])
    //Open Called File
    if(argc == 2)
    {
-      const char *outp;
+      /*const char *outp;
       string outstr;
       ifstream infile;
       infile.open (argv[1]);
@@ -60,11 +68,19 @@ int main(int argc, char* argv[])
             printw("%s\n", outp);
          }
          infile.close();
+         */
+      ifstream infile;
+      infile.open (argv[1]);
+      if(infile.good())
+      {
+         openfile(argv[1]);
+
       }
       else
       {
          opennewfile(argv[1]);
       }
+      infile.close();
    }
    else
    {
@@ -144,7 +160,6 @@ int main(int argc, char* argv[])
       }
       if(!linenumber && lined)
       {
-         {
             int holdx = x;
             int holdy = y;
             move(0,0);
@@ -168,8 +183,9 @@ int main(int argc, char* argv[])
             minX = minX - digitcount - 1;
             move(y,x);
 
-         }
       }
+      printbuffer(minY,maxY,minX);
+      move(y,x);
       input = getch();
       if(!insertmode)
       {
@@ -177,7 +193,7 @@ int main(int argc, char* argv[])
          {
          case FORWARD:
          case KEY_RIGHT:
-            if(x < maxX - 1) { x += 1; }
+            if(x+1 < COLS && x+1 <= lines[y - minY].length() + minX) { x += 1; }
             break;
          case BACKWARD:
          case KEY_LEFT:
@@ -185,11 +201,15 @@ int main(int argc, char* argv[])
             break;
          case UPWARD:
          case KEY_DOWN:
-            if(y < maxY - 2) { y += 1; }
+            if(y+1 < LINES-1 && y+1 < lines.size()) { y += 1; }
+            if(x >= lines[y - minY].length())
+               x = lines[y - minY].length();
             break;
          case DOWNWARD:
          case KEY_UP:
             if(y > minY) { y -= 1; }
+            if(x >= lines[y - minY].length())
+               x = lines[y - minY].length();
             break;
          case ITRIGGER:
             insertmode = true;
@@ -234,6 +254,13 @@ int main(int argc, char* argv[])
                   wattroff(status, A_REVERSE);
                }
                   break;
+               case SAVE:
+               savefile(status, maxX);
+               break;
+               case QUIT:
+               endwin();
+               return 0;
+               break;
                default:
                wmove(status, 0, 0);
                wattron(status, A_REVERSE);
@@ -266,7 +293,7 @@ int main(int argc, char* argv[])
          }
          else if(input == KEY_RIGHT)
          {
-            if(x < maxX - 1) { x += 1; }
+            if(x+1 < COLS && x+1 <= lines[y - minY].length() + minX) { x += 1; }
          }
          else if(input == KEY_LEFT)
          {
@@ -274,28 +301,75 @@ int main(int argc, char* argv[])
          }
          else if(input == KEY_DOWN)
          {
-            if(y < maxY - 2) { y += 1; }
+            if(y+1 < LINES-1 && y+1 < lines.size()) { y += 1; }
+            if(x >= lines[y - minY].length())
+               x = lines[y - minY].length();
          }
          else if (input == KEY_UP)
          {
             if(y > minY) { y -= 1; }
+            if(x >= lines[y - minY].length())
+               x = lines[y - minY].length();
          }
-         else if(input == ENTER)
+         else if(input == ENTER || input == KEY_ENTER)
          {
+            //Bring The Line Down From Position if not at the end of the line
+            if(x < lines[y - minY].length())
+            {
+                //Put the rest of the line on a new line
+                insertline(lines[y - minY].substr(x, lines[y - minY].length() - x), y - minY + 1);
+                //Remove that part of the line
+                lines[y - minY].erase(x, lines[y - minY].length() - x);
+            }
+            else //if at the end of the line
+            {
+                insertline("", y-minY+1);
+            }
             if(y < maxY - 2)
             {
+               x = 0;
                y += 1;
-               x = minX;
             }
-            else
+         }
+         else if(input == KEY_BACKSPACE)
+         {
+            if (x > minX)
             {
-               y = minY;
-               x = minX;
+               lines[y - minY].erase(--x, 1);
             }
+            else if(y > minY)
+            {
+                x = lines[y - minY - 1].length();
+                //Bring the line down
+                lines[y - minY - 1] += lines[y - minY];
+                //Delete the current line
+                removeline(y - minY);
+                y -= 1;
+            }
+            move(y,x);
+         }
+         else if(input ==KEY_DC)
+         {
+            if(x == lines[y - minY].length() && y != lines.size() - 1)
+               {
+                   //Bring the line down
+                   lines[y - minY] += lines[y - minY + 1];
+                   //Delete the line
+                   removeline(y+1);
+               }
+               else
+               {
+                   lines[y - minY].erase(x, 1);
+               }
+         }
+         else if(input == TAB || input == KEY_BTAB || input == KEY_CTAB || input == KEY_CATAB || input == KEY_STAB)
+         {
+            lines[y - minY].insert(x, 3, ' ');
+            x = x + 3;
          }
          else
          {
-            printw("%c", input);
+            lines[y - minY].insert(x, 1, char(input));
             if(x < maxX - 1)
             {
                x += 1;
@@ -312,10 +386,8 @@ int main(int argc, char* argv[])
             }
          }
       }
-      move(y,x);
    }
 
-   getch();
 
    endwin();
 

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-g++ -c editor.cpp
-g++ -c Include/file.cpp
-
-g++ editor.o file.o -lncurses -Wall -o edit
