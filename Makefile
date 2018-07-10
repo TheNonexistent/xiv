@@ -11,7 +11,7 @@ file.o: Include/file.cpp $(HEADERS)
 buffer.o: Include/buffer.cpp $(HEADERS)
 	g++ -c Include/buffer.cpp
 
-xim: xim.o file.o buffer.o
+xiv: xiv.o file.o buffer.o
 	g++ xiv.o file.o buffer.o -o xiv -lncurses -Wall
 
 clean:
