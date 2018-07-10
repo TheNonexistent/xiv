@@ -1,9 +1,9 @@
 HEADERS = Include/buffer.h Include/file.h
 
-default: xim
+default: xiv
 
-xim.o: xim.cpp $(HEADERS)
-	g++ -c xim.cpp
+xim.o: xiv.cpp $(HEADERS)
+	g++ -c xiv.cpp
 
 file.o: Include/file.cpp $(HEADERS)
 	g++ -c Include/file.cpp
@@ -12,10 +12,10 @@ buffer.o: Include/buffer.cpp $(HEADERS)
 	g++ -c Include/buffer.cpp
 
 xim: xim.o file.o buffer.o
-	g++ xim.o file.o buffer.o -o xim -lncurses -Wall
+	g++ xiv.o file.o buffer.o -o xiv -lncurses -Wall
 
 clean:
-	-rm -f xim.o
+	-rm -f xiv.o
 	-rm -f buffer.o
 	-rm -f file.o
-	-rm -f xim
+	-rm -f xiv
