@@ -30,8 +30,9 @@ void removeline(int ln)
 }
 
 
-void printbuffer(int minY,int maxY, int minX)
+int printbuffer(int minY,int maxY, int minX)
 {
+   int linecount = 0;
    for(int i = minY; i<LINES-1; i++)
     {
         if(i >= lines.size())
@@ -42,11 +43,26 @@ void printbuffer(int minY,int maxY, int minX)
         else
         {
               mvprintw(i, minX, lines[i-minY].c_str());
+              linecount++;
         }
         clrtoeol();
     }
   for(int i = lines.size(); i < maxY - 1;i++)
   {
-     mvprintw(i, minX, "~");
+     if(!has_colors())
+     {
+        mvprintw(i, minX, "~");
+     }
+     else
+     {
+        start_color();
+        use_default_colors();
+        init_pair(1, COLOR_CYAN, -1);
+        attron(COLOR_PAIR(1));
+        mvprintw(i, minX, "~");
+        attroff(COLOR_PAIR(1));
+
+     }
   }
+  return linecount;
 }

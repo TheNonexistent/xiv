@@ -184,7 +184,16 @@ int main(int argc, char* argv[])
             move(y,x);
 
       }
-      printbuffer(minY,maxY,minX);
+      int linenumber = printbuffer(minY,maxY,minX);
+      refresh();
+      wattron(top, A_REVERSE);
+      wmove(top,0,0);
+      wprintw(top, "[Filename : %s]", ofilename.c_str());
+      wprintw(top,"(%dL)", linenumber);
+      wmove(top,0,(maxX-1)/2);
+      wprintw(top, "XIV");
+      wattroff(top, A_REVERSE);
+      wrefresh(top);
       move(y,x);
       input = getch();
       if(!insertmode)
