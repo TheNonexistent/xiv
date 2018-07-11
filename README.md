@@ -30,6 +30,8 @@ e - Go To The End Of The File
 
 By pressing 'i' in normal mode the editor will go in Insert Mode, in which you can insert characters in the opened file.
 
+In Insert Mode you can press 'Ctrl + n' to go back to Normal Mode.
+
 
 
 Regards.
