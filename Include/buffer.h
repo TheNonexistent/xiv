@@ -12,7 +12,7 @@ void insertline(string, int);
 void appendline(string);
 void removeline(int);
 
-int printbuffer(int,int,int,int,int);
+int printbuffer(int,int,int,int,int,int);
 
 string removetabs(string);
 

@@ -5,7 +5,7 @@ vector<string> lines;
 
 string removetabs(string line)
 {
-   int tab = line.find("\t");
+    int tab = line.find("\t");
     if(tab != line.npos)// npos = no position, not found
         return removetabs(line.replace(tab, 1, "   "));//Recursive // replace tab with 3 white space
     else
@@ -30,22 +30,32 @@ void removeline(int ln)
 }
 
 
-int printbuffer(int starty,int startx,int minY,int maxY, int minX)
+int printbuffer(int starty,int startx,int minY,int maxY, int minX, int maxX)
 {
-   for(int i = minY; i<LINES-1; i++)
+   for(int i = 0; i<LINES-2; i++)
     {
-        if(i+starty >= lines.size())
+        if(i + minY+starty >= lines.size())
         {
-            move(i, minX);
+            move(i + minY, minX);
             clrtoeol();//The clrtoeol() and wclrtoeol() functions erase the current line from the cursor to the end of the line, inclusive, in the current or specified window. These functions do not update the cursor.
         }
         else
         {
-              mvprintw(i, minX, lines[i+starty].c_str());
+              if(startx < lines[i+starty].length() + 1)
+              {
+                 //mvprintw(i + minY, minX, lines[i+starty].c_str());
+                 mvaddstr(i + minY, minX, lines[i+starty].substr(startx,maxX).c_str());
+              }
+              else
+              {
+                 move(i + minY, minX);
+                 delch();
+                 clrtoeol();
+              }
         }
         clrtoeol();
     }
-  for(int i = lines.size() - starty - minY; i < maxY - 1;i++)
+  for(int i = lines.size() - starty ; i < maxY - 1;i++)
   {
      if(!has_colors())
      {
