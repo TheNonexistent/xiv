@@ -324,8 +324,17 @@ int main(int argc, char* argv[])
                wattroff(status, A_REVERSE);
                break;
                case END:
+               if(lines.size() > maxY)
+               {
                starty = lines.size() - maxY + 1;
-               y = maxY - 2;
+               y = lines.size() - starty - minY;
+               }
+               else
+               {
+                  starty = 0;
+                  y = lines.size() - minY;
+               }
+               /*
                if(lines[y - minY + (starty)].length() > maxX)
                {
                   startx = lines[y - minY + (starty)].length() - 1;
@@ -336,6 +345,9 @@ int main(int argc, char* argv[])
                startx = 0;
                x = lines[y - minY + (starty)].length();
                }
+               */
+               startx = 0;
+               x= minX;
                clearstatus(maxX,status);
                wmove(status,0,0);
                wattron(status, A_REVERSE);
