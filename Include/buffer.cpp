@@ -30,24 +30,22 @@ void removeline(int ln)
 }
 
 
-int printbuffer(int minY,int maxY, int minX)
+int printbuffer(int starty,int startx,int minY,int maxY, int minX)
 {
-   int linecount = 0;
    for(int i = minY; i<LINES-1; i++)
     {
-        if(i >= lines.size())
+        if(i+starty >= lines.size())
         {
             move(i, minX);
             clrtoeol();//The clrtoeol() and wclrtoeol() functions erase the current line from the cursor to the end of the line, inclusive, in the current or specified window. These functions do not update the cursor.
         }
         else
         {
-              mvprintw(i, minX, lines[i-minY].c_str());
-              linecount++;
+              mvprintw(i, minX, lines[i+starty].c_str());
         }
         clrtoeol();
     }
-  for(int i = lines.size(); i < maxY - 1;i++)
+  for(int i = lines.size() - starty - minY; i < maxY - 1;i++)
   {
      if(!has_colors())
      {
@@ -61,8 +59,19 @@ int printbuffer(int minY,int maxY, int minX)
         attron(COLOR_PAIR(1));
         mvprintw(i, minX, "~");
         attroff(COLOR_PAIR(1));
-
      }
   }
+
+
+
+  int linecount = 0;
+  for(int i = minY; i<LINES-1; i++)
+   {
+       if(!(i >= lines.size()))
+       {
+             linecount++;
+       }
+       clrtoeol();
+   }
   return linecount;
 }

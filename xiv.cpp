@@ -98,6 +98,8 @@ int main(int argc, char* argv[])
    //Setting Variables
    bool linenumber = false;
    bool lined = false;
+   int starty = minY;
+   int startx = 0;
    //Getting The Maximum Amount Of Rows And Columns.(Screen Size)
    int maxY, maxX;
    getmaxyx(stdscr,maxY,maxX);
@@ -186,7 +188,8 @@ int main(int argc, char* argv[])
             move(y,x);
 
       }
-      int linenumber = printbuffer(minY,maxY,minX);
+      //printbuffer(int starty,int startxint minY,int maxY, int minX)
+      int linenumber = printbuffer(starty,startx,minY,maxY,minX);
       refresh();
       wattron(top, A_REVERSE);
       wmove(top,0,0);
@@ -204,7 +207,7 @@ int main(int argc, char* argv[])
          {
          case FORWARD:
          case KEY_RIGHT:
-            if(x+1 < COLS && x+1 <= lines[y - minY].length() + minX) { x += 1; }
+            if(x+1 < COLS && x+1 <= lines[y - minY + (starty + minY)].length() + minX) { x += 1; }
             break;
          case BACKWARD:
          case KEY_LEFT:
@@ -212,15 +215,15 @@ int main(int argc, char* argv[])
             break;
          case UPWARD:
          case KEY_DOWN:
-            if(y+1 < LINES-1 && y+1 < lines.size()) { y += 1; }
-            if(x >= lines[y - minY].length())
-               x = lines[y - minY].length();
+            if(y+1 < LINES-1) { if(y+1 < lines.size() - starty - minY) { y += 1; } } else if(y+1 < lines.size() - starty - minY) { if(starty < lines.size()) { starty++;} }
+            if(x >= lines[y - minY + (starty + minY)].length())
+               x = lines[y - minY + (starty + minY)].length();
             break;
          case DOWNWARD:
          case KEY_UP:
-            if(y > minY) { y -= 1; }
-            if(x >= lines[y - minY].length())
-               x = lines[y - minY].length();
+            if(y > minY) { y -= 1; } else { if(starty > minY) { starty--;} }
+            if(x >= lines[y - minY + (starty + minY)].length())
+               x = lines[y - minY + (starty + minY)].length();
             break;
          case ITRIGGER:
             insertmode = true;
@@ -311,7 +314,7 @@ int main(int argc, char* argv[])
          }
          else if(input == KEY_RIGHT)
          {
-            if(x+1 < COLS && x+1 <= lines[y - minY].length() + minX) { x += 1; }
+            if(x+1 < COLS && x+1 <= lines[y - minY + (starty + minY)].length() + minX) { x += 1; }
          }
          else if(input == KEY_LEFT)
          {
@@ -319,88 +322,95 @@ int main(int argc, char* argv[])
          }
          else if(input == KEY_DOWN)
          {
-            if(y+1 < LINES-1 && y+1 < lines.size()) { y += 1; }
-            if(x >= lines[y - minY].length())
-               x = lines[y - minY].length();
+            if(y+1 < LINES-1) { if(y+1 < lines.size() - starty - minY) { y += 1; } } else if(y+1 < lines.size() - starty - minY) { if(starty < lines.size()) { starty++;} }
+            if(x >= lines[y - minY + (starty + minY)].length())
+               x = lines[y - minY + (starty + minY)].length();
          }
          else if (input == KEY_UP)
          {
-            if(y > minY) { y -= 1; }
-            if(x >= lines[y - minY].length())
-               x = lines[y - minY].length();
+            if(y > minY) { y -= 1; } else { if(starty > minY) { starty--;} }
+            if(x >= lines[y - minY + (starty + minY)].length())
+               x = lines[y - minY + (starty + minY)].length();
          }
          else if(input == ENTER || input == KEY_ENTER)
          {
             //Bring The Line Down From Position if not at the end of the line
-            if(x < lines[y - minY].length())
+            if(x < lines[y - minY + (starty + minY)].length())
             {
                 //Put the rest of the line on a new line
-                insertline(lines[y - minY].substr(x, lines[y - minY].length() - x), y - minY + 1);
+                insertline(lines[y - minY + (starty + minY)].substr(x, lines[y - minY + (starty + minY)].length() - x), y - minY + 1 + (starty + minY));
                 //Remove that part of the line
-                lines[y - minY].erase(x, lines[y - minY].length() - x);
+                lines[y - minY + (starty + minY)].erase(x, lines[y - minY + (starty + minY)].length() - x);
             }
             else //if at the end of the line
             {
-                insertline("", y-minY+1);
+                insertline("", y-minY+1 + (starty + minY));
             }
             if(y < maxY - 2)
             {
                x = 0;
                y += 1;
             }
+            else
+            {
+               starty++;
+               x = 0;
+            }
          }
          else if(input == KEY_BACKSPACE || input == BACKSPACE)
          {
             if (x > minX)
             {
-               lines[y - minY].erase(--x, 1);
+               lines[y - minY + (starty + minY)].erase(--x, 1);
             }
             else if(y > minY)
             {
-                x = lines[y - minY - 1].length();
+                x = lines[y - minY - 1 + (starty + minY)].length();
                 //Bring the line down
-                lines[y - minY - 1] += lines[y - minY];
+                lines[y - minY - 1 + (starty + minY)] += lines[y - minY + (starty + minY)];
                 //Delete the current line
-                removeline(y - minY);
+                removeline(y - minY + (starty + minY));
                 y -= 1;
+            }
+            else if(starty > minY)
+            {
+               x = lines[y - minY - 1 + (starty + minY)].length();
+               //Bring the line down
+               lines[y - minY - 1 + (starty + minY)] += lines[y - minY + (starty + minY)];
+               //Delete the current line
+               removeline(y - minY + (starty + minY));
+               starty -= 8;
+               y += 7;
+
             }
             move(y,x);
          }
          else if(input ==KEY_DC)
          {
-            if(x == lines[y - minY].length() && y != lines.size() - 1)
+            if(x == lines[y - minY + (starty + minY)].length() && y != lines.size() - 1)
                {
                    //Bring the line down
-                   lines[y - minY] += lines[y - minY + 1];
+                   lines[y - minY + (starty + minY)] += lines[y - minY + 1];
                    //Delete the line
                    removeline(y+1);
                }
                else
                {
-                   lines[y - minY].erase(x, 1);
+                   lines[y - minY + (starty + minY)].erase(x, 1);
                }
          }
          else if(input == TAB || input == KEY_BTAB || input == KEY_CTAB || input == KEY_CATAB || input == KEY_STAB)
          {
-            lines[y - minY].insert(x, 3, ' ');
+            lines[y - minY + (starty + minY)].insert(x, 3, ' ');
             x = x + 3;
          }
          else
          {
-            lines[y - minY].insert(x, 1, char(input));
+            lines[y - minY + (starty + minY)].insert(x, 1, char(input));
+            //Implement H Scrolling.
             if(x < maxX - 1)
             {
                x += 1;
-            }
-            else if(y < maxY - 2)
-            {
-               x = minX;
-               y += 1;
-            }
-            else
-            {
-               x = minX;
-               y = minY;
             }
          }
       }
