@@ -13,6 +13,7 @@ The editor launches in normal mode. In this mode you can move around and run the
 In normal mode , by pressing '/' button the editor will wait for a command(commands are one letter characters and do not need to be entered).
 
 [LIST OF COMMANDS]
+
 s - Save The File
 
 q - Quit XIV
