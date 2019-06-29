@@ -1,6 +1,6 @@
 XIV
 
-XIV(XIV Isn't Vim) is a simple text editor written in c++ using the ncurses library
+XIV(XIV Isn't Vim) is a simple text-based text editor written in c++ using the ncurses library
 
 I'm only developing this editor to learn ncurses and practice with it. so it isn't(at least for now) anything serious!
 
